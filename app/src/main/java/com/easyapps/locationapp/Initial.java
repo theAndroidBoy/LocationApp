@@ -9,7 +9,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.TextView;
-import android.widget.Toast;
+
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -18,25 +18,23 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 public class Initial implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-        LocationListener, ActivityCompat.OnRequestPermissionsResultCallback {
+        LocationListener {
 
     private TextView txtOutput;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private Activity mActivity;
 
-
-
     Context context;
+
     public Initial(Activity activity) {
         Log.i("flow", "Initial: ");
-        mActivity=activity;
-        context=(Context)activity;
+        mActivity = activity;
+        context = (Context) activity;
         initialSetup();
     }
 
-    private void initialSetup()
-    {
+    private void initialSetup() {
         Log.i("flow", "initialSetup: ");
         mGoogleApiClient = new GoogleApiClient.Builder(context)
                 .addApi(LocationServices.API)
@@ -44,8 +42,7 @@ public class Initial implements GoogleApiClient.ConnectionCallbacks, GoogleApiCl
                 .addOnConnectionFailedListener(this)
                 .build();
 
-        txtOutput = (TextView)(mActivity.findViewById(R.id.txt));
-
+        txtOutput = (TextView) (mActivity.findViewById(R.id.txt));
 
         mGoogleApiClient.connect();
     }
@@ -64,11 +61,10 @@ public class Initial implements GoogleApiClient.ConnectionCallbacks, GoogleApiCl
     @Override
     public void onLocationChanged(Location location) {
 
-        Log.i("flow", "onLocationChanged: "+Double.toString(location.getLatitude()));
+        Log.i("flow", "onLocationChanged: " + Double.toString(location.getLatitude()));
 
-        txtOutput.setText("latitude : "+Double.toString(location.getLatitude()) +"\n"+
-                          "longitude: "+Double.toString(location.getLongitude()) );
-
+        txtOutput.setText("latitude : " + Double.toString(location.getLatitude()) + "\n" +
+                "longitude: " + Double.toString(location.getLongitude()));
 
     }
 
@@ -81,42 +77,12 @@ public class Initial implements GoogleApiClient.ConnectionCallbacks, GoogleApiCl
         mLocationRequest.setInterval(1000); // Update location every second
 
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) !=
-                PackageManager.PERMISSION_GRANTED ) {
+                PackageManager.PERMISSION_GRANTED) {
 
-            ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}
-                    , 101);
-        }
-        else
+            return;
+        } else
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
 
-    }
-
-    //...........................................................
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        Log.i("flow", "onRequestPermissionsResult: ");
-        switch (requestCode) {
-            case 101: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
-                            PackageManager.PERMISSION_GRANTED ) {
-
-                        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-                    }
-                }
-                else {
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                }
-                return;
-            }
-            //add more cases if you are making more than one permission request
-        }
     }
 
 
